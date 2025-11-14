@@ -24,7 +24,7 @@ jobs:
 
     - name: Disparar Despliegue en Render
       if: success()
-      run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+      run: curl -X POST https://panaderia-backend-60n9.onrender.com
       
     - name: Notificación Final
       run: echo "¡Todo salió perfecto! Render se está actualizando. 🚀"
