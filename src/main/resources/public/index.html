@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panadería Pro</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #fdf6e3; color: #5d4037; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #d35400; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .section { background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; padding: 20px; }
+        h2 { border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background-color: #e67e22; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        button { background-color: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #2ecc71; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🥖 Sistema Panadería 🥐</h1>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <button onclick="cargarTodo()">🔄 Actualizar Tablas</button>
+    </div>
+
+    <div class="section">
+        <h2>🍞 Inventario de Panes</h2>
+        <table id="tablaPanes">
+            <thead><tr><th>ID</th><th>Nombre</th><th>Precio</th></tr></thead>
+            <tbody><tr><td colspan="3">Cargando...</td></tr></tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>👥 Clientes</h2>
+        <table id="tablaClientes">
+            <thead><tr><th>ID</th><th>Nombre</th><th>Cédula</th></tr></thead>
+            <tbody><tr><td colspan="3">Cargando...</td></tr></tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>💰 Ventas</h2>
+        <table id="tablaVentas">
+            <thead><tr><th>ID</th><th>ID Cliente</th><th>ID Pan</th><th>Total</th></tr></thead>
+            <tbody><tr><td colspan="4">Cargando...</td></tr></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Función para cargar Panes
+    async function cargarPanes() {
+        try {
+            const res = await fetch('/panes');
+            const datos = await res.json();
+            let html = '';
+            datos.forEach(p => {
+                html += `<tr><td>${p.id}</td><td>${p.nombre}</td><td>$${p.precio}</td></tr>`;
+            });
+            document.querySelector('#tablaPanes tbody').innerHTML = html;
+        } catch (e) { console.error("Error cargando panes:", e); }
+    }
+
+    // Función para cargar Clientes
+    async function cargarClientes() {
+        try {
+            const res = await fetch('/clientes');
+            const datos = await res.json(); // Aquí recibe el JSON de Java
+            let html = '';
+            datos.forEach(c => {
+                // OJO: Aquí usamos los nombres exactos del Modelo Java (Cliente.java)
+                html += `<tr><td>${c.id}</td><td>${c.nombre}</td><td>${c.cedula}</td></tr>`;
+            });
+            document.querySelector('#tablaClientes tbody').innerHTML = html;
+        } catch (e) { console.error("Error cargando clientes:", e); }
+    }
+
+    // Función para cargar Ventas
+    async function cargarVentas() {
+        try {
+            const res = await fetch('/ventas');
+            const datos = await res.json();
+            let html = '';
+            datos.forEach(v => {
+                // OJO: Usamos idCliente e idPan (camelCase) porque así lo manda Java
+                html += `<tr><td>${v.id}</td><td>${v.id_cliente}</td><td>${v.id_pan}</td><td>$${v.total}</td></tr>`;
+            });
+            document.querySelector('#tablaVentas tbody').innerHTML = html;
+        } catch (e) { console.error("Error cargando ventas:", e); }
+    }
+
+    function cargarTodo() {
+        cargarPanes();
+        cargarClientes();
+        cargarVentas();
+    }
+
+    // Cargar al inicio
+    cargarTodo();
+</script>
+
+</body>
+</html>
