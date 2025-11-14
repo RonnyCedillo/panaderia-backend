@@ -1,0 +1,30 @@
+name: Pipeline de Despliegue Continuo (CI/CD)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout del código
+      uses: actions/checkout@v4
+
+    - name: Configurar Java 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Compilar con Maven
+      run: mvn -B package --file pom.xml -DskipTests
+
+    - name: Disparar Despliegue en Render
+      if: success()
+      run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+      
+    - name: Notificación Final
+      run: echo "¡Todo salió perfecto! Render se está actualizando. 🚀"
